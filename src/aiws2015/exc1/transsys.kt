@@ -17,10 +17,10 @@ trait Transsys<State> {
 
 class WhileProg : Transsys<Int> {
     override val initStates: List<Int>
-        get() = Arrays.asList(1)
+        get() = listOf(1)
 
     override fun next(x: Int): List<Int> =
-            if (x < 100) Arrays.asList(x + 1) else emptyList()
+            if (x < 100) listOf(x + 1) else emptyList()
 }
 
 
@@ -36,14 +36,14 @@ class Prog11 : Transsys<Any> {
 
 class Prog12 : Transsys<Int> {
     override val initStates: List<Int>
-        get() = Arrays.asList(1)
+        get() = listOf(1)
 
     override fun next(x: Int): List<Int> {
         when (x) {
-            1 -> return Arrays.asList(2)
-            2 -> return Arrays.asList(1)
+            1 -> return listOf(2)
+            2 -> return listOf(1)
             3 -> return emptyList()
-            else -> return Arrays.asList(3)
+            else -> return listOf(3)
         }
     }
 }
@@ -51,9 +51,9 @@ class Prog12 : Transsys<Int> {
 
 class Prog13 : Transsys<Int> {
     override val initStates: List<Int>
-        get() = Arrays.asList(1)
+        get() = listOf(1)
 
-    override fun next(x: Int): List<Int> = Arrays.asList(x + 1);
+    override fun next(x: Int): List<Int> = listOf(x + 1);
 }
 
 class Reachstates<State>(t: Transsys<State>) {
@@ -62,7 +62,7 @@ class Reachstates<State>(t: Transsys<State>) {
             HashSet(myT.initStates).union(s.flatMap { x -> myT.next(x) });
 }
 
-val ITERATIONS = 1000
+val ITERATIONS = 100
 
 fun main(args: Array<String>) {
     println("WhileProg")
@@ -80,7 +80,7 @@ fun main(args: Array<String>) {
  */
 private fun <State> lfp(prog: Transsys<State>): Boolean {
     var reachableStates = setOf<State>()
-    for (i in 1..ITERATIONS) {
+    for (i in 0..ITERATIONS) {
         val newStates = Reachstates(prog).f(reachableStates)
         if (reachableStates.equals(newStates)) {
             println("Least fixed point found in $i iterations\n$reachableStates")
