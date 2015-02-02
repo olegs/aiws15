@@ -19,32 +19,68 @@ class WhileProg : Transsys<Int> {
     override val initStates: List<Int>
         get() = Arrays.asList(1)
 
-    override fun next(x: Int): List<Int> {
-        return if (x < 100) Arrays.asList(x + 1) else emptyList()
+    override fun next(x: Int): List<Int> =
+            if (x < 100) Arrays.asList(x + 1) else emptyList()
+}
+
+
+class Prog11 : Transsys<Any> {
+    override val initStates: List<Any>
+        get() = emptyList()
+
+    override fun next(x: Any): List<Any> {
+        return emptyList()
     }
+}
+
+
+class Prog12 : Transsys<Int> {
+    override val initStates: List<Int>
+        get() = Arrays.asList(1)
+
+    override fun next(x: Int): List<Int> {
+        when (x) {
+            1 -> return Arrays.asList(2)
+            2 -> return Arrays.asList(1)
+            3 -> return emptyList()
+            else -> return Arrays.asList(3)
+        }
+    }
+}
+
+
+class Prog13 : Transsys<Int> {
+    override val initStates: List<Int>
+        get() = Arrays.asList(1)
+
+    override fun next(x: Int): List<Int> = Arrays.asList(x + 1);
 }
 
 class Reachstates<State>(t: Transsys<State>) {
     val myT = t
-
-    fun f(s : Set<State>): Set<State> {
-        val set = HashSet<State>(myT.initStates)
-        val list = s.flatMap { x -> myT.next(x) }
-        return set.union(list);
-    }
+    fun f(s: Set<State>): Set<State> =
+            HashSet(myT.initStates).union(s.flatMap { x -> myT.next(x) });
 }
+
 val ITERATIONS = 1000
 
 fun main(args: Array<String>) {
+    println("WhileProg")
     findMinimalFixedPoint(WhileProg())
+    println("1.1 Program, which finishes and takes finite number of steps to compute reachable set")
+    findMinimalFixedPoint(Prog11())
+    println("1.2 Program, which doesn't finish and takes finite number of steps to compute reachable set")
+    findMinimalFixedPoint(Prog12())
+    println("1.3 Program, which doesn't finish and takes infinite number of steps to compute reachable set")
+    findMinimalFixedPoint(Prog13())
 }
 
-private fun findMinimalFixedPoint(whileProg: WhileProg): Boolean {
-    var reachableStates = setOf<Int>()
+private fun <State> findMinimalFixedPoint(prog: Transsys<State>): Boolean {
+    var reachableStates = setOf<State>()
     for (i in 1..ITERATIONS) {
-        val newStates = Reachstates(whileProg).f(reachableStates)
+        val newStates = Reachstates(prog).f(reachableStates)
         if (reachableStates.equals(newStates)) {
-            println("Minimal Fixed Point\n$reachableStates")
+            println("Minimal Fixed Point found in $i iterations\n$reachableStates")
             return true
         }
         reachableStates = newStates
