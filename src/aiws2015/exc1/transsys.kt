@@ -66,26 +66,29 @@ val ITERATIONS = 1000
 
 fun main(args: Array<String>) {
     println("WhileProg")
-    findMinimalFixedPoint(WhileProg())
+    lfp(WhileProg())
     println("1.1 Program, which finishes and takes finite number of steps to compute reachable set")
-    findMinimalFixedPoint(Prog11())
+    lfp(Prog11())
     println("1.2 Program, which doesn't finish and takes finite number of steps to compute reachable set")
-    findMinimalFixedPoint(Prog12())
+    lfp(Prog12())
     println("1.3 Program, which doesn't finish and takes infinite number of steps to compute reachable set")
-    findMinimalFixedPoint(Prog13())
+    lfp(Prog13())
 }
 
-private fun <State> findMinimalFixedPoint(prog: Transsys<State>): Boolean {
+/**
+ * Least fixed point
+ */
+private fun <State> lfp(prog: Transsys<State>): Boolean {
     var reachableStates = setOf<State>()
     for (i in 1..ITERATIONS) {
         val newStates = Reachstates(prog).f(reachableStates)
         if (reachableStates.equals(newStates)) {
-            println("Minimal Fixed Point found in $i iterations\n$reachableStates")
+            println("Least fixed point found in $i iterations\n$reachableStates")
             return true
         }
         reachableStates = newStates
     }
-    println("No Fixed point found in $ITERATIONS iterations\n$reachableStates")
+    println("No least fixed point found in $ITERATIONS iterations\n$reachableStates")
     return false
 }
 
