@@ -1,8 +1,6 @@
 package aiws2015.exc1
 
-import java.util.ArrayList
 import java.util.HashSet
-import java.util.Arrays
 
 /**
  * Sample implementation of Transitional Semantics
