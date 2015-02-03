@@ -10,7 +10,11 @@ trait Parity {
 
     fun bot(): Parity = Bottom()
 
-    fun leq(p1: Parity, p2: Parity): Boolean = p1 <= p2;
+    fun leq(p1: Parity, p2: Parity): Boolean = try {
+        p1 <= p2
+    } catch (_ : NotComparableException) {
+        false
+    }
 
     fun join(p1: Parity, p2: Parity): Parity {
         if (p1 < p2) {
@@ -57,6 +61,8 @@ trait Parity {
     fun compareTo(other: Parity): Int;
 }
 
+class NotComparableException(msg:String) : Exception(msg)
+
 data class Bottom : Parity {
     override fun compareTo(other: Parity): Int = if (other is Bottom) 0 else -1
 }
@@ -66,14 +72,16 @@ data class Top : Parity {
 }
 
 data class Odd : Parity {
-    // TODO[oleg] What should be return in case of Odd and Even comparison?
     override fun compareTo(other: Parity): Int =
-            if (other is Odd) 0 else if (other !is Even) -other.compareTo(this) else 0;
+            if (other is Odd) 0
+            else if (other !is Even) -other.compareTo(this)
+            else throw NotComparableException("$this and $other are not comparable")
 }
 
 data class Even : Parity {
-    // TODO[oleg] What should be return in case of Odd and Even comparison?
     override fun compareTo(other: Parity): Int =
-            if (other is Even) 0 else if (other !is Odd) -other.compareTo(this) else 0;
+            if (other is Even) 0
+            else if (other !is Odd) -other.compareTo(this)
+            else throw NotComparableException("$this and $other are not comparable")
 }
 
