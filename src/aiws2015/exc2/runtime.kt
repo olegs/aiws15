@@ -32,8 +32,8 @@ fun eval(input: Int, instructions: List<Instruction>, debug: Boolean) : Int {
         if (debug) {
             println("$i: $state")
         }
-        if (state.ps < 1 || state.ps >= instructions.size()) {
-            throw RuntimeException("Out of bounds $i ${state.yv}")
+        if (state.ps < 1 || state.ps > instructions.size()) {
+            throw RuntimeException("Out of bounds $i $state")
         }
         val instruction = instructions.get(state.ps - 1) // Minus 1 for natural ordering
         if (instruction is STOP) {
