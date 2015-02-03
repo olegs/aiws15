@@ -58,11 +58,11 @@ trait Parity {
 }
 
 data class Bottom : Parity {
-    override fun compareTo(other: Parity): Int = -1
+    override fun compareTo(other: Parity): Int = if (other is Bottom) 0 else -1
 }
 
 data class Top : Parity {
-    override fun compareTo(other: Parity): Int = 1
+    override fun compareTo(other: Parity): Int = if (other is Top) 0 else 1
 }
 
 data class Odd : Parity {
