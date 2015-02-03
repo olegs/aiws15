@@ -32,9 +32,7 @@ public class Lexer(val inputStream: InputStream) {
 
     private fun isDone(): Boolean = index >= bytes.size()
 
-    fun isWhiteSpace(c: Char): Boolean {
-        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
-    }
+    private fun isWhiteSpace(c: Char): Boolean = c == ' ' || c == '\t' || c == '\n' || c == '\r'
 
     private fun lexeme(): String {
         // Skip whitespace
