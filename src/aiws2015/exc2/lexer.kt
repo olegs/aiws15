@@ -26,17 +26,11 @@ public class Lexer(val inputStream: InputStream) {
     val bytes = inputStream.readBytes()
     var index = 0
 
-    private fun nextChar(): Char {
-        return bytes[index++].toChar()
-    }
+    private fun nextChar() = index++
 
-    private fun peekChar(): Char {
-        return bytes[index].toChar()
-    }
+    private fun peekChar(): Char = bytes[index].toChar()
 
-    private fun isDone(): Boolean {
-        return index >= bytes.size
-    }
+    private fun isDone(): Boolean = index >= bytes.size()
 
     fun isWhiteSpace(c: Char): Boolean {
         return c == ' ' || c == '\t' || c == '\n' || c == '\r';
