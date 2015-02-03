@@ -28,7 +28,6 @@ public class Parser(val inputStream: InputStream) {
         while (true) {
             val token = lexer.nextToken()
             when (token) {
-                is Lexer.EOF -> return instructions;
                 is Lexer.INC -> {
                     val v = lexer.nextToken()
                     when (v) {
