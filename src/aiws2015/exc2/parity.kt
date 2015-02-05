@@ -6,30 +6,42 @@ package aiws2015.exc2
  * @date 03/02/15
  */
 
-trait Parity {
+    // TODO[oleg] why aren't they generated
+data object Bottom : Parity() {
+    override fun toString() = "bot"
+}
 
-    fun bot(): Parity = Bottom
+data object Top : Parity() {
+    override fun toString() = "top"
+}
 
-    fun leq(p1: Parity, p2: Parity): Boolean = try {
-        p1 <= p2
-    } catch (_ : NotComparableException) {
-        false
+data object Odd : Parity() {
+    override fun toString() = "odd"
+}
+
+data object Even : Parity() {
+    override fun toString() = "even"
+}
+
+
+open class Parity() : Lattice<Parity> {
+    override fun leq(p1: Parity, p2: Parity): Boolean = when (p1) {
+        is Bottom -> true
+        is Top -> if (p2 is Top) true else false
+        is Even -> if (p2 is Even || p2 is Top) true else false
+        is Odd -> if (p2 is Odd || p2 is Top) true else false
+        else -> false
     }
 
-    fun join(p1: Parity, p2: Parity): Parity {
-        if (p1 < p2) {
-            return p1;
-        }
-        if (p2 < p1) {
-            return p2;
-        }
-        if (p1 is Odd && p2 is Even || p1 is Even && p2 is Odd) {
-            return Bottom;
-        }
-        return p1;
+    public override fun join(p1: Parity, p2: Parity): Parity = when (p1) {
+        is Bottom -> p2
+        is Top -> Top
+        is Even -> if (p2 is Even || p2 is Bottom) Even else Top
+        is Odd -> if (p2 is Odd || p2 is Bottom ) Odd else Top
+        else -> throw RuntimeException("Unexpected: $p1")
     }
 
-    fun iszero(p: Parity): Parity =
+    override fun iszero(p: Parity): Parity =
             when (p) {
                 is Bottom -> Bottom
                 is Odd -> Bottom
@@ -38,9 +50,9 @@ trait Parity {
                 else -> throw RuntimeException()
             }
 
-    fun notzero(p: Parity): Parity = p;
+    override fun notzero(p: Parity): Parity = p;
 
-    fun incr(p: Parity): Parity =
+    override fun incr(p: Parity): Parity =
             when (p) {
                 is Bottom -> Bottom
                 is Odd -> Even
@@ -49,39 +61,7 @@ trait Parity {
                 else -> throw RuntimeException()
             }
 
-    fun decr(p: Parity): Parity =
-            when (p) {
-                is Bottom -> Bottom
-                is Odd -> Even
-                is Even -> Odd
-                is Top -> Top
-                else -> throw RuntimeException()
-            }
-
-    fun compareTo(other: Parity): Int;
+    override fun decr(p: Parity): Parity = incr(p)
 }
 
-class NotComparableException(msg:String) : Exception(msg)
-
-data object Bottom : Parity {
-    override fun compareTo(other: Parity): Int = if (other is Bottom) 0 else -1
-}
-
-data object Top : Parity {
-    override fun compareTo(other: Parity): Int = if (other is Top) 0 else 1
-}
-
-data object Odd : Parity {
-    override fun compareTo(other: Parity): Int =
-            if (other is Odd) 0
-            else if (other !is Even) -other.compareTo(this)
-            else throw NotComparableException("$this and $other are not comparable")
-}
-
-data object Even : Parity {
-    override fun compareTo(other: Parity): Int =
-            if (other is Even) 0
-            else if (other !is Odd) -other.compareTo(this)
-            else throw NotComparableException("$this and $other are not comparable")
-}
 

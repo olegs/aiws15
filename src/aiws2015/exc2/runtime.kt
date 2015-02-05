@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 
 fun execute(input: Int, instructions: List<Instruction>, debug: Boolean): Int {
 
-    val MAX_INSTRUCTIONS = 1000
+    val MAX_INSTRUCTIONS = 100
 
     fun eval(instruction: Instruction, s: State): State? {
         return when (instruction) {

@@ -12,10 +12,22 @@ import java.util.ArrayList
 data class State(val ps: Int, val xv: Int, val yv: Int, val zv: Int)
 
 trait Instruction
-data class INC(val v: Char) : Instruction
-data class DEC(val v: Char) : Instruction
-data class ZERO(val v: Char, val p1: Int, val p2: Int) : Instruction
-data object STOP : Instruction
+data class INC(val v: Char) : Instruction {
+    override fun toString(): String = "inc $v"
+}
+
+data class DEC(val v: Char) : Instruction {
+    override fun toString(): String = "dec $v"
+}
+
+data class ZERO(val v: Char, val p1: Int, val p2: Int) : Instruction {
+    override fun toString() : String = "zero $v $p1 else $p2"
+}
+
+// TODO[oleg] why aren't they generated for data objects
+data object STOP : Instruction {
+    override fun toString() = "stop"
+}
 
 
 public class Parser(val inputStream: InputStream) {
@@ -46,6 +58,7 @@ public class Parser(val inputStream: InputStream) {
             val lexeme = lexemeBuilder.toString()
             return lexeme
         }
+
         fun error(lexeme: String) {
             throw RuntimeException("Wrong lexeme $lexeme")
         }
@@ -72,7 +85,7 @@ public class Parser(val inputStream: InputStream) {
                     val p1 = Integer.valueOf(lexeme())
                     val ele = lexeme()
                     val p2 = Integer.valueOf(lexeme())
-                    if (v != null &&  "else".equals(ele))
+                    if (v != null && "else".equals(ele))
                         instructions.add(ZERO(v, p1, p2))
                     else
                         throw RuntimeException("Error in ZERO parsing $v $p1 $ele $p2")
