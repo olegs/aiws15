@@ -10,8 +10,7 @@ import java.io.ByteArrayInputStream
 
 // TODO[oleg] add cmdline parser
 fun main(args: Array<String>) {
-
-    eval(42, Parser(ByteArrayInputStream(
+    execute(42, Parser(ByteArrayInputStream(
             """
             zero x 5 else 2
             inc y
@@ -19,12 +18,13 @@ fun main(args: Array<String>) {
             zero x 1 else 1
             stop
             """.toByteArray())).parse(), true)
-    //    eval(5, Parser(FileInputStream("/home/oleg/work/3CounterMach/tests/test5-double.3cm")).parse(), true )
+    //    execute(5, Parser(FileInputStream("/home/oleg/work/3CounterMach/tests/test5-double.3cm")).parse(), true )
 }
+
 
 val MAX_INSTRUCTIONS = 1000
 
-fun eval(input: Int, instructions: List<Instruction>, debug: Boolean) : Int {
+fun execute(input: Int, instructions: List<Instruction>, debug: Boolean): Int {
     // Init state contract
     var state = State(1, input, 0, 0)
 
@@ -40,8 +40,7 @@ fun eval(input: Int, instructions: List<Instruction>, debug: Boolean) : Int {
             println("Successfully finished in $i steps, result: ${state.yv}")
             return state.yv
         }
-
-        val newState = instruction.eval(state)
+        val newState = eval(instruction, state)
         if (newState == null) {
             throw RuntimeException("3CM stuck")
         }
@@ -49,4 +48,28 @@ fun eval(input: Int, instructions: List<Instruction>, debug: Boolean) : Int {
     }
 
     throw RuntimeException("NOT finished in in $MAX_INSTRUCTIONS steps, result: ${state.yv}")
+}
+
+private fun eval(instruction: Instruction, s: State): State? {
+    return when (instruction) {
+        is INC -> when (instruction.v) {
+            'x' -> State(s.ps + 1, s.xv + 1, s.yv, s.zv)
+            'y' -> State(s.ps + 1, s.xv, s.yv + 1, s.zv)
+            'z' -> State(s.ps + 1, s.xv, s.yv, s.zv + 1)
+            else -> null;
+        }
+        is DEC -> when (instruction.v) {
+            'x' -> if (s.xv > 0) State(s.ps + 1, s.xv - 1, s.yv, s.zv) else null
+            'y' -> if (s.yv > 0) State(s.ps + 1, s.xv, s.yv - 1, s.zv) else null
+            'z' -> if (s.zv > 0) State(s.ps + 1, s.xv, s.yv, s.zv - 1) else null
+            else -> null;
+        }
+        is ZERO -> when (instruction.v) {
+            'x' -> if (s.xv == 0) State(instruction.p1, s.xv, s.yv, s.zv) else State(instruction.p2, s.xv, s.yv, s.zv)
+            'y' -> if (s.yv == 0) State(instruction.p1, s.xv, s.yv, s.zv) else State(instruction.p2, s.xv, s.yv, s.zv)
+            'z' -> if (s.zv == 0) State(instruction.p1, s.xv, s.yv, s.zv) else State(instruction.p2, s.xv, s.yv, s.zv)
+            else -> null;
+        }
+        else -> null
+    }
 }

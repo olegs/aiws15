@@ -11,52 +11,77 @@ import java.util.ArrayList
 
 data class State(val ps: Int, val xv: Int, val yv: Int, val zv: Int)
 
-trait Instruction {
-    fun eval(s: State): State?
-}
+trait Instruction
+data class INC(val v: Char) : Instruction
+data class DEC(val v: Char) : Instruction
+data class ZERO(val v: Char, val p1: Int, val p2: Int) : Instruction
+data class STOP() : Instruction
+
 
 public class Parser(val inputStream: InputStream) {
-    val lexer = Lexer(inputStream)
-
     fun parse(): List<Instruction> {
 
-        fun error(token: Lexer.Token) {
-            throw RuntimeException("Wrong token $token")
+        val bytes = inputStream.readBytes()
+        var index = 0
+
+        fun nextChar() = index++
+
+        fun peekChar(): Char = bytes[index].toChar()
+
+        fun isDone(): Boolean = index >= bytes.size()
+
+        fun isWhiteSpace(c: Char): Boolean = c == ' ' || c == '\t' || c == '\n' || c == '\r'
+
+        fun lexeme(): String {
+            // Skip whitespace
+            while (!isDone() && isWhiteSpace(peekChar())) {
+                nextChar()
+            }
+
+            var lexemeBuilder = StringBuilder()
+            while (!isDone() && !isWhiteSpace(peekChar())) {
+                lexemeBuilder.append(peekChar())
+                nextChar()
+            }
+            val lexeme = lexemeBuilder.toString()
+            return lexeme
+        }
+        fun error(lexeme: String) {
+            throw RuntimeException("Wrong lexeme $lexeme")
+        }
+
+        fun v(lexeme: String): Char? = when (lexeme) {
+            "x", "y", "z" -> lexeme.charAt(0)
+            else -> null
         }
 
         var instructions = ArrayList<Instruction>();
         while (true) {
-            val token = lexer.nextToken()
-            when (token) {
-                is Lexer.INC -> {
-                    val v = lexer.nextToken()
-                    when (v) {
-                        is Lexer.VAR -> instructions.add(INC(v.v))
-                        else -> error(v)
-                    }
+            val lexeme = lexeme()
+            when (lexeme) {
+                "inc" -> {
+                    val v = v(lexeme())
+                    if (v != null) instructions.add(INC(v)) else error("Wrong var")
                 }
-                is Lexer.DEC -> {
-                    val v = lexer.nextToken()
-                    when (v) {
-                        is Lexer.VAR -> instructions.add(DEC(v.v))
-                        else -> error(v)
-                    }
+                "dec" -> {
+                    val v = v(lexeme())
+                    if (v != null) instructions.add(DEC(v)) else error("Wrong var")
                 }
-                is Lexer.ZERO -> {
-                    val v = lexer.nextToken()
-                    val p1 = lexer.nextToken()
-                    val ele = lexer.nextToken()
-                    val p2 = lexer.nextToken()
-                    if (v is Lexer.VAR && p1 is Lexer.NUMBER && ele is Lexer.ELSE && p2 is Lexer.NUMBER)
-                        instructions.add(ZERO(v.v, p1.number, p2.number))
+                "zero" -> {
+                    val v = v(lexeme())
+                    val p1 = Integer.valueOf(lexeme())
+                    val ele = lexeme()
+                    val p2 = Integer.valueOf(lexeme())
+                    if (v != null &&  "else".equals(ele))
+                        instructions.add(ZERO(v, p1, p2))
                     else
                         throw RuntimeException("Error in ZERO parsing $v $p1 $ele $p2")
                 }
-                is Lexer.STOP -> {
+                "stop" -> {
                     instructions.add(STOP())
                     return instructions;
                 }
-                is Lexer.EOF -> throw RuntimeException("Enexpected EOF")
+                else -> throw RuntimeException("Enexpected $lexeme")
             }
         }
     }
