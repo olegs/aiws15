@@ -15,21 +15,21 @@ import aiws2015.exc2.TripleLattice
 
 
 fun main(args: Array<String>) {
-    /*    analyze(Parser(ByteArrayInputStream(
-                """
+    analyze(Parser(ByteArrayInputStream(
+            """
                 inc y
                 zero y 1 else 1
                 stop
-                """.toByteArray())).parse())
+                """.toByteArray())).parse(), TripleLattice(Top, Even, Even))
 
-        analyze(Parser(ByteArrayInputStream(
-                """
+    analyze(Parser(ByteArrayInputStream(
+            """
                 inc z
                 zero z 3 else 4
                 inc y
                 dec z
                 stop
-                """.toByteArray())).parse())*/
+                """.toByteArray())).parse(), TripleLattice(Top, Even, Even))
     analyze(Parser(ByteArrayInputStream(
             """
             zero x 6 else 2
