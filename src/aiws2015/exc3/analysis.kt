@@ -45,13 +45,12 @@ private fun <T : Lattice<T>> apply(s: HashMap<Int, TripleLattice<T>>, instructio
     var result = HashMap(s)
     for (pc in 1..instructions.size()) {
         val instruction = instructions.get(pc - 1)
-        val tp = result.get(pc)
         when (instruction) {
-            is INC -> result.put(pc + 1, tp.join(var_apply(tp, instruction.v, { p -> p.incr() })))
-            is DEC -> result.put(pc + 1, tp.join(var_apply(tp, instruction.v, { p -> p.decr() })))
+            is INC -> result.put(pc + 1, result.get(pc + 1).join(var_apply(s.get(pc), instruction.v, { p -> p.incr() })))
+            is DEC -> result.put(pc + 1, result.get(pc + 1).join(var_apply(s.get(pc), instruction.v, { p -> p.decr() })))
             is ZERO -> {
-                result.put(instruction.p1, tp.join(var_apply(tp, instruction.v, { p -> p.iszero() })))
-                result.put(instruction.p2, tp.join(var_apply(tp, instruction.v, { p -> p.notzero() })))
+                result.put(instruction.p1, result.get(instruction.p1).join(var_apply(s.get(pc), instruction.v, { p -> p.iszero() })))
+                result.put(instruction.p2, result.get(instruction.p2).join(var_apply(s.get(pc), instruction.v, { p -> p.notzero() })))
             }
         }
     }
