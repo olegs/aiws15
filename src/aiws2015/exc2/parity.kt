@@ -6,7 +6,7 @@ package aiws2015.exc2
  * @date 03/02/15
  */
 
-    // TODO[oleg] why aren't they generated
+// TODO[oleg] why aren't they generated
 data object Bottom : Parity() {
     override fun toString() = "bot"
 }
@@ -25,24 +25,28 @@ data object Even : Parity() {
 
 
 open class Parity() : Lattice<Parity> {
-    override fun leq(p1: Parity, p2: Parity): Boolean = when (p1) {
+    override fun name(): String = "Parity domain"
+
+    override fun bottom(): Parity = Bottom
+
+    override fun leq(other: Parity): Boolean = when (this) {
         is Bottom -> true
-        is Top -> if (p2 is Top) true else false
-        is Even -> if (p2 is Even || p2 is Top) true else false
-        is Odd -> if (p2 is Odd || p2 is Top) true else false
+        is Top -> if (other is Top) true else false
+        is Even -> if (other is Even || other is Top) true else false
+        is Odd -> if (other is Odd || other is Top) true else false
         else -> false
     }
 
-    public override fun join(p1: Parity, p2: Parity): Parity = when (p1) {
-        is Bottom -> p2
+    public override fun join(other: Parity): Parity = when (this) {
+        is Bottom -> other
         is Top -> Top
-        is Even -> if (p2 is Even || p2 is Bottom) Even else Top
-        is Odd -> if (p2 is Odd || p2 is Bottom ) Odd else Top
-        else -> throw RuntimeException("Unexpected: $p1")
+        is Even -> if (other is Even || other is Bottom) Even else Top
+        is Odd -> if (other is Odd || other is Bottom ) Odd else Top
+        else -> throw RuntimeException("Unexpected: $this")
     }
 
-    override fun iszero(p: Parity): Parity =
-            when (p) {
+    override fun iszero(): Parity =
+            when (this) {
                 is Bottom -> Bottom
                 is Odd -> Bottom
                 is Even -> Even
@@ -50,10 +54,10 @@ open class Parity() : Lattice<Parity> {
                 else -> throw RuntimeException()
             }
 
-    override fun notzero(p: Parity): Parity = p;
+    override fun notzero(): Parity = this;
 
-    override fun incr(p: Parity): Parity =
-            when (p) {
+    override fun incr(): Parity =
+            when (this) {
                 is Bottom -> Bottom
                 is Odd -> Even
                 is Even -> Odd
@@ -61,7 +65,7 @@ open class Parity() : Lattice<Parity> {
                 else -> throw RuntimeException()
             }
 
-    override fun decr(p: Parity): Parity = incr(p)
+    override fun decr(): Parity = incr()
 }
 
 
