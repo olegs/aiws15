@@ -15,7 +15,7 @@ trait Instruction
 data class INC(val v: Char) : Instruction
 data class DEC(val v: Char) : Instruction
 data class ZERO(val v: Char, val p1: Int, val p2: Int) : Instruction
-data class STOP() : Instruction
+data object STOP : Instruction
 
 
 public class Parser(val inputStream: InputStream) {
@@ -78,7 +78,7 @@ public class Parser(val inputStream: InputStream) {
                         throw RuntimeException("Error in ZERO parsing $v $p1 $ele $p2")
                 }
                 "stop" -> {
-                    instructions.add(STOP())
+                    instructions.add(STOP)
                     return instructions;
                 }
                 else -> throw RuntimeException("Enexpected $lexeme")
