@@ -6,25 +6,25 @@ package aiws2015.exc2
  * @date 03/02/15
  */
 
-// TODO[oleg] why aren't they generated
-data object Bottom : Parity() {
-    override fun toString() = "bot"
-}
-
-data object Top : Parity() {
-    override fun toString() = "top"
-}
-
-data object Odd : Parity() {
-    override fun toString() = "odd"
-}
-
-data object Even : Parity() {
-    override fun toString() = "even"
-}
-
-
 open class Parity() : Lattice<Parity> {
+    // TODO[oleg] why aren't they generated
+    data object Bottom : Parity() {
+        override fun toString() = "bot"
+    }
+
+    data object Top : Parity() {
+        override fun toString() = "top"
+    }
+
+    data object Odd : Parity() {
+        override fun toString() = "odd"
+    }
+
+    data object Even : Parity() {
+        override fun toString() = "even"
+    }
+
+
     override fun name(): String = "Parity domain"
 
     override fun bottom(): Parity = Bottom
@@ -37,13 +37,10 @@ open class Parity() : Lattice<Parity> {
         else -> false
     }
 
-    public override fun join(other: Parity): Parity = when (this) {
-        is Bottom -> other
-        is Top -> Top
-        is Even -> if (other is Even || other is Bottom) Even else Top
-        is Odd -> if (other is Odd || other is Bottom ) Odd else Top
-        else -> throw RuntimeException("Unexpected: $this")
-    }
+    public override fun join(other: Parity): Parity =
+            if (this.leq(other)) other
+            else if (other.leq(this)) this
+            else Top
 
     override fun iszero(): Parity =
             when (this) {
