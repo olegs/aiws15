@@ -19,5 +19,5 @@ trait Lattice<T> {
 data class TripleLattice<T : Lattice<T>>(val x: T, val y: T, val z: T) {
     override fun toString(): String = "{x:$x, y:$y, z:$z}"
     fun join(other: TripleLattice<T>): TripleLattice<T> =
-            TripleLattice<T>(x.join(other.x), y.join(other.y), z.join(other.z))
+            TripleLattice(x.join(other.x), y.join(other.y), z.join(other.z))
 }
