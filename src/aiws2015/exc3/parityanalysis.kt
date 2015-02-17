@@ -56,8 +56,10 @@ Exception Details:
 */
     analyze(Parser(ByteArrayInputStream(
             """
+                zero x 4 else 2
+                dec x
+                zero x 4 else 2
                 inc y
-                zero y 1 else 1
                 stop
                 """.toByteArray())).parse(), TripleLattice(Interval.Top, Interval.Range(0, 0), Interval.Range(0, 0)))
 
